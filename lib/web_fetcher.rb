@@ -77,6 +77,13 @@ module WebFetcher
 
     def download_asset(target, dest:)
       content = get(target, follow: true)
+
+      # FIXME: if "with all assets loading properly" means that
+      # I should put asset files to fit attrs specified in original html,
+      # I must fix destination paths.
+      # BTW `target` has the original fullpath in its URI#path attr
+      # it doesn't seem to be so difficult, maybe.
+
       output_to_file(content, dest, File.basename(target.path))
     end
 
