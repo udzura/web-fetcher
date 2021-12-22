@@ -48,7 +48,7 @@ module WebFetcher
     end
 
     private
-    def get(target)
+    def get(target, follow: true)
       http = Net::HTTP.new(target.host, target.port)
       if target.scheme == 'https'
         http.use_ssl = true
@@ -61,11 +61,22 @@ module WebFetcher
              end
       res = http.get(path)
 
+      if follow && res.is_a?(Net::HTTPRedirection)
+        @followed ||= 0
+        @followed += 1
+        if @followed >= 10 # TODO: setting
+          raise "Too many redirect: #{res.inspect}"
+        end
+
+        redirected = URI.parse(res.header['Location'])
+        return get(redirected, follow: true)
+      end
+
       res.body
     end
 
     def download_asset(target, dest:)
-      content = get(target)
+      content = get(target, follow: true)
       output_to_file(content, dest, File.basename(target.path))
     end
 
