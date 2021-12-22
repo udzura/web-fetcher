@@ -135,7 +135,12 @@ module WebFetcher
       # TODO: dry
       doc = Nokogiri::HTML body
 
+      # TODO: support more asset types, edge cases
       @images = doc.css('img').to_a.map{|e| e.attr(:src)}
+      @stylesheets = doc.css('link').
+                       select{|e| e.attr(:rel) == 'stylesheet' }.
+                       map{|e| e.attr(:href) }
+      @javascripts = doc.css('script').to_a.map{|e| e.attr(:src)}.compact
     end
 
     def each_assets(base_uri:, &blk)
