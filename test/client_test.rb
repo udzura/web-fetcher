@@ -17,11 +17,11 @@ class WebFetcherClientTest < Test::Unit::TestCase
     # FIXME: this is private method test
     content = "Hello, world"
     dir = @path
-    path = 'dummy.com.html'
+    path = 'dummy.example.com.html'
 
     @client.send :output_to_file, content, dir, path
 
-    assert File.file?("/tmp/foo/dummy.com.html")
-    assert_equal "Hello, world", File.read("/tmp/foo/dummy.com.html")
+    assert File.file?("/tmp/foo/dummy.example.com.html")
+    assert_equal "Hello, world", File.read("/tmp/foo/dummy.example.com.html")
   end
 end
