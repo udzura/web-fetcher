@@ -117,7 +117,7 @@ module WebFetcher
       doc = Nokogiri::HTML body
       @num_links = doc.css('a').size
       @images = doc.css('img').size
-    rescue => e
+    rescue => _e
       # if failed ro parse XML, fallback to regex...
       # but TBA
     end
