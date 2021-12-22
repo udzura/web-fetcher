@@ -23,14 +23,17 @@ module WebFetcher
 
     private
     def get(target)
-      res = Net::HTTP.start(target.host, target.port) do |http|
-        path = if target.path.empty?
-                 "/"
-               else
-                 target.path
-               end
-        http.get(path)
+      http = Net::HTTP.new(target.host, target.port)
+      if target.scheme == 'https'
+        http.use_ssl = true
       end
+
+      path = if target.path.empty?
+               "/"
+             else
+               target.path
+             end
+      res = http.get(path)
 
       res.body
     end
@@ -52,6 +55,7 @@ module WebFetcher
     end
   rescue => e
     $stderr.puts "Error: #{e.inspect}"
+    raise e
     exit 10
   end
 end
