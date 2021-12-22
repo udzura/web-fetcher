@@ -10,7 +10,8 @@ module WebFetcher
   end
 
   class Client1
-    def initialize
+    def initialize(show_metadata: false)
+      @show_metadata = show_metadata
       @path_rule = lambda {|uri|
         "#{uri.host}.html"
       }
@@ -24,7 +25,9 @@ module WebFetcher
       content = get(target)
       @metadata.parse_body_and_set_metadata!(content)
 
-      print_metadata @metadata
+      if @show_metadata
+        print_metadata @metadata
+      end
 
       dir = Dir.pwd
       output_to_file(content, dir, @path_rule.call(target))
@@ -92,8 +95,17 @@ module WebFetcher
   end
 
   def self.main1
-    args = ARGV.dup
-    client = Client1.new
+    args = []
+    show_metadata = false
+    ARGV.each do |arg|
+      if arg == '--metadata'
+        show_metadata = true
+      else
+        args << arg
+      end
+    end
+
+    client = Client1.new(show_metadata: show_metadata)
 
     args.each do |uri|
       target = URI.parse(uri)
