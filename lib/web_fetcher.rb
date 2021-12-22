@@ -20,7 +20,9 @@ module WebFetcher
 
     def process(target)
       @metadata = Metadata.new(target)
-      @metadata.set_last_fetch!(@path_rule.call(target))
+      dir = ENV['WEB_FETCHER_DEST_DIR'] || Dir.pwd
+
+      @metadata.set_last_fetch!(dir, @path_rule.call(target))
 
       content = get(target)
       @metadata.parse_body_and_set_metadata!(content)
@@ -29,14 +31,11 @@ module WebFetcher
         print_metadata @metadata
       end
 
-      dir = Dir.pwd
       output_to_file(content, dir, @path_rule.call(target))
     end
 
     private
     def get(target)
-
-
       http = Net::HTTP.new(target.host, target.port)
       if target.scheme == 'https'
         http.use_ssl = true
@@ -76,9 +75,10 @@ module WebFetcher
     end
     attr_reader :site, :num_links, :images, :last_fetch
 
-    def set_last_fetch!(filepath)
-      if File.exist?(filepath)
-        @last_fetch = File.stat(filepath).mtime
+    def set_last_fetch!(dir, filepath)
+      fullpath = File.join(dir, filepath)
+      if File.exist?(fullpath)
+        @last_fetch = File.stat(fullpath).mtime
       else
         @last_fetch = nil
       end

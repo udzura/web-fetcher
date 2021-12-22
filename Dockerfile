@@ -8,4 +8,4 @@ WORKDIR /app
 RUN bundle config set --local path 'vendor/bundle'
 RUN bundle install
 
-CMD ["./fetch"]
+ENTRYPOINT ["./fetch"]

@@ -17,7 +17,7 @@ class WebFetcherMetadataTest < Test::Unit::TestCase
     uri = URI.parse("https://dummy.example.com")
     @metadata = WebFetcher::Metadata.new uri
 
-    @metadata.set_last_fetch!(File.join(@path, 'dummy.example.com.html'))
+    @metadata.set_last_fetch!(@path, 'dummy.example.com.html')
     @metadata.parse_body_and_set_metadata!(content)
 
     assert_equal("dummy.example.com", @metadata.site)

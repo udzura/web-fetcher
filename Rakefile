@@ -9,3 +9,7 @@ end
 
 require "bundler/gem_tasks"
 task default: %i[]
+
+task :build => ["Dockerfile"] do
+  sh 'docker build -t web-fetcher .'
+end
