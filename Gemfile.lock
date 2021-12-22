@@ -2,11 +2,15 @@ PATH
   remote: .
   specs:
     web-fetcher (0.1.0)
+      nokogiri
 
 GEM
   remote: https://rubygems.org/
   specs:
+    nokogiri (1.12.5-x86_64-darwin)
+      racc (~> 1.4)
     power_assert (2.0.1)
+    racc (1.6.0)
     rake (13.0.6)
     test-unit (3.5.3)
       power_assert
