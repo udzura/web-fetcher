@@ -1,35 +1,37 @@
 # Web::Fetcher
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/web/fetcher`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'web-fetcher'
-```
-
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install web-fetcher
+Sample project to implement web content fetcher.
 
 ## Usage
 
-TODO: Write usage instructions here
+```console
+$ rake build
+$ docker run --rm -ti web-fetcher https://udzura.jp <...>
 
-## Development
+# If you want to get files, assets from a docker container
+$ docker run --rm -ti \
+    -v /tmp/out:/tmp/out \
+    -e WEB_FETCHER_DEST_DIR=/tmp/out \
+    web-fetcher https://udzura.jp <...>
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+### Show metadata
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```
+$ docker run --rm -ti web-fetcher --metadata https://udzura.jp <...>
+```
+### Download all assets
 
-## Contributing
+```
+$ docker run --rm -ti web-fetcher --download-assets https://udzura.jp <...>
+```
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/udzura/web-fetcher.
+## Elapsed time for implementation
+
+* Design, research ... about 1 hours
+* Basic, Show metadata ... about 2 hours [`87094a1a030b514e63b40e6dc27d3762b3111d43`](https://github.com/udzura/web-fetcher/commit/87094a1a030b514e63b40e6dc27d3762b3111d43) ~ [`7216112102a061b66765f950b14a0f558abef1a7`](https://github.com/udzura/web-fetcher/commit/7216112102a061b66765f950b14a0f558abef1a7)
+* Download all assets ...  about 1 hours [`29925b43ed7bc78f490940a0e42ecf8f2616fbe9`](https://github.com/udzura/web-fetcher/commit/29925b43ed7bc78f490940a0e42ecf8f2616fbe9) ~ [`6a228678e008a29be1c1b04719a173e72bfb5ab6`](https://github.com/udzura/web-fetcher/commit/6a228678e008a29be1c1b04719a173e72bfb5ab6)
+
+## TODO
+
+* [ ] Simple E2E test, using rack-based mock server...
