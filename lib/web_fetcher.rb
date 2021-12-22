@@ -97,9 +97,14 @@ module WebFetcher
   def self.main1
     args = []
     show_metadata = false
+    download_assets = false
+
     ARGV.each do |arg|
-      if arg == '--metadata'
+      case arg
+      when'--metadata'
         show_metadata = true
+      when'--download-assets'
+        download_assets = true
       else
         args << arg
       end
