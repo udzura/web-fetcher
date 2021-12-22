@@ -17,13 +17,13 @@ module WebFetcher
         "#{uri.host}.html"
       }
       @metadata = nil
+      @dir = ENV['WEB_FETCHER_DEST_DIR'] || Dir.pwd
     end
 
     def process(target)
       @metadata = Metadata.new(target)
-      dir = ENV['WEB_FETCHER_DEST_DIR'] || Dir.pwd
 
-      @metadata.set_last_fetch!(dir, @path_rule.call(target))
+      @metadata.set_last_fetch!(@dir, @path_rule.call(target))
 
       content = get(target)
       @metadata.parse_body_and_set_metadata!(content)
@@ -32,13 +32,17 @@ module WebFetcher
         print_metadata @metadata
       end
 
-      output_to_file(content, dir, @path_rule.call(target))
+      output_to_file(content, @dir, @path_rule.call(target))
 
       if @download_assets
+        require 'fileutils'
+        dest = File.join(@dir, '_assets', @metadata.site)
+        FileUtils.mkdir_p dest
+
         repo = AssetRepo.new
         repo.parse_body_and_extract_links!(content)
         repo.each_assets(base_uri: target) do |uri|
-          p uri
+          download_asset(uri, dest: dest)
         end
       end
     end
@@ -60,7 +64,9 @@ module WebFetcher
       res.body
     end
 
-    def download_asset
+    def download_asset(target, dest:)
+      content = get(target)
+      output_to_file(content, dest, File.basename(target.path))
     end
 
     def output_to_file(content, dir, path)
