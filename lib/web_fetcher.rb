@@ -10,8 +10,9 @@ module WebFetcher
   end
 
   class Client1
-    def initialize(show_metadata: false)
+    def initialize(show_metadata: false, download_assets: false)
       @show_metadata = show_metadata
+      @download_assets = download_assets
       @path_rule = lambda {|uri|
         "#{uri.host}.html"
       }
@@ -32,6 +33,14 @@ module WebFetcher
       end
 
       output_to_file(content, dir, @path_rule.call(target))
+
+      if @download_assets
+        repo = AssetRepo.new
+        repo.parse_body_and_extract_links!(content)
+        repo.each_assets(base_uri: target) do |uri|
+          p uri
+        end
+      end
     end
 
     private
@@ -49,6 +58,9 @@ module WebFetcher
       res = http.get(path)
 
       res.body
+    end
+
+    def download_asset
     end
 
     def output_to_file(content, dir, path)
@@ -94,6 +106,42 @@ module WebFetcher
     end
   end
 
+  class AssetRepo
+    def initialize
+      @images = []
+      @stylesheets = []
+      @javascripts = []
+    end
+    attr_reader :images, :stylesheets, :javascripts
+
+    def parse_body_and_extract_links!(body)
+      # TODO: dry
+      doc = Nokogiri::HTML body
+
+      @images = doc.css('img').to_a.map{|e| e.attr(:src)}
+    end
+
+    def each_assets(base_uri:, &blk)
+      [*images, *stylesheets, *javascripts].each do |path|
+        uri = case path
+              # scheme
+              when /\A([a-zA-Z0-9]+):\/\//
+                # using $1 is a bit hacky
+                schema = $1
+                if ['http', 'https'].include?(schema)
+                  URI.parse(path)
+                else
+                  raise "Unsupported schema: #{schema}"
+                end
+              # absolute / relative path can be handled by URI#merge!
+              else
+                base_uri.merge(path)
+              end
+        blk.call(uri)
+      end
+    end
+  end
+
   def self.main1
     args = []
     show_metadata = false
@@ -110,7 +158,7 @@ module WebFetcher
       end
     end
 
-    client = Client1.new(show_metadata: show_metadata)
+    client = Client1.new(show_metadata: show_metadata, download_assets: download_assets)
 
     args.each do |uri|
       target = URI.parse(uri)
